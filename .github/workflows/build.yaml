@@ -1,6 +1,5 @@
 name: Build
 
-# Trigger the workflow on any pull request, push or manual dispatch
 on: [pull_request, push, workflow_dispatch]
 
 jobs:
@@ -79,3 +78,9 @@ jobs:
 
       - name: Run Build
         run: /docker-entrypoint.sh --arch=${{ matrix.architecture }}
+        
+      - name: Upload Linux Server Files
+        uses: actions/upload-artifact@v4
+        with:
+          name: InstallFiles-linux-${{ matrix.architecture }}
+          path: bin/server/
