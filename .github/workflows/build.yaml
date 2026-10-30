@@ -1,5 +1,6 @@
 name: Build
 
+# Trigger the workflow on any pull request, push or manual dispatch
 on: [pull_request, push, workflow_dispatch]
 
 jobs:
@@ -79,8 +80,14 @@ jobs:
       - name: Run Build
         run: /docker-entrypoint.sh --arch=${{ matrix.architecture }}
         
+      # Этот шаг выведет в логи список файлов, чтобы мы могли понять, куда они сохранились
+      - name: Check output directories
+        run: ls -R bin/ || ls -R InstallFiles/ || true
+        
       - name: Upload Linux Server Files
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: InstallFiles-linux-${{ matrix.architecture }}
-          path: bin/server/
+          # Изменили путь на bin/ (если сработает, то в архиве будет папка bin целиком)
+          # Если файлов опять не будет, попробуйте поменять на: path: InstallFiles/
+          path: bin/
