@@ -80,6 +80,23 @@ jobs:
       - name: Run Build
         run: /docker-entrypoint.sh --arch=${{ matrix.architecture }}
         
+      - name: Create build artifacts (Linux)
+        run: |
+          mkdir -p InstallFiles
+          # Копируем содержимое bin/server, если оно существует
+          if [ -d "bin/server" ]; then
+            cp -r bin/server/* InstallFiles/ || true
+          fi
+          # Если файлы лежат просто в bin, копируем оттуда
+          if [ -d "bin" ] && [ -z "$(ls -A InstallFiles)" ]; then
+            cp -r bin/* InstallFiles/ || true
+          fi
+          # Если файлы раскиданы, ищем их и копируем в нашу папку
+          if [ -z "$(ls -A InstallFiles)" ]; then
+            find . -name "*.so" -exec cp {} InstallFiles/ \;
+            find . -name "mta-server64" -exec cp {} InstallFiles/ \;
+          fi
+          
       - name: Upload Linux Server Files
         uses: actions/upload-artifact@v6
         with:
